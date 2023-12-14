@@ -39,5 +39,12 @@ void init_wp_pool() {
   free_ = wp_pool;
 }
 
+/*void wp_display()
+{
+  int i;
+
+
+
+}*/
 /* TODO: Implement the functionality of watchpoint */
 

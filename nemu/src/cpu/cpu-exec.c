@@ -70,7 +70,7 @@ static void exec_once(Decode *s, vaddr_t pc) {
 #endif
 #endif
 }
-
+//n=-1
 static void execute(uint64_t n) {
   Decode s;
   for (;n > 0; n --) {
@@ -96,8 +96,8 @@ void assert_fail_msg() {
   statistic();
 }
 
-/* Simulate how the CPU works. */
-void cpu_exec(uint64_t n) {
+/* Simulate how the CPU works. */     //n=-1
+void cpu_exec(uint64_t n) {     
   g_print_step = (n < MAX_INST_TO_PRINT);
   switch (nemu_state.state) {
     case NEMU_END: case NEMU_ABORT:

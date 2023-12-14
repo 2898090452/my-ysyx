@@ -18,6 +18,10 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
+#include <regex.h>
+
+#include <memory/paddr.h>
+#include <device/mmio.h>
 
 static int is_batch_mode = false;
 
@@ -26,7 +30,7 @@ void init_wp_pool();
 
 /* We use the `readline' library to provide more flexibility to read from stdin. */
 static char* rl_gets() {
-  static char *line_read = NULL;
+  static char *line_read = NULL;  //存储输入的命令行
 
   if (line_read) {
     free(line_read);
@@ -43,15 +47,75 @@ static char* rl_gets() {
 }
 
 static int cmd_c(char *args) {
+  //printf("测试专用\n");
   cpu_exec(-1);
   return 0;
 }
 
 
 static int cmd_q(char *args) {
-  return -1;
+  //return -1;
+  exit(0);
+  return 0;
 }
+//让程序单步执行N条指令后暂停执行,当N没有给出时, 缺省为1
+static int cmd_s(char *args){
+    int N = 0;
+    if(args == NULL)
+        {N = 1;}
+    else
+        {sscanf(args,"%d",&N);}
+    cpu_exec(N);
+    return 0;
+}
+//打印寄存器状态,打印监视点信息
+static int cmd_info(char *args){
+  char *str1="r";
+  char *str2="w";
+  if(!strcmp(args,str1))
+  {
+    //printf("88888\n");
+    isa_reg_display();
+  }
+  if(!strcmp(args,str2))
+  {
+   // printf("99999\n");;
+  }
+  else{return 0;}
+  return 0;
+}
+word_t paddr_read(paddr_t addr, int len);
 
+static int cmd_x(char *args){
+  char *str1;
+  char *str2;
+  int str3,addr,len,i;
+  str1=strtok(args," ");
+  str2=strtok(NULL,"");
+  sscanf(str2,"%x",&addr);
+  printf("addr=%x\n",addr);
+  sscanf(str1,"%d",&len);
+  printf("len=%d\n",len);
+  for(i=0;i<len;i++)
+  {
+    str3=paddr_read(addr,1);
+    printf("%x\n",str3);
+    addr=addr+4;
+  }
+  return 0;
+}
+word_t ads;     
+static int cmd_p(char *args){
+  /*int n=10;
+  int num;
+  srand(time(NULL));  //初始化随机数种子
+  num=rand() % (n+1);   //生成0-n的随机数
+  printf("num=%d\n",num);*/
+  bool *nb={false};
+  expr(args,nb);
+  return 0;
+
+}
 static int cmd_help(char *args);
 
 static struct {
@@ -62,6 +126,10 @@ static struct {
   { "help", "Display information about all supported commands", cmd_help },
   { "c", "Continue the execution of the program", cmd_c },
   { "q", "Exit NEMU", cmd_q },
+  { "s","Step the program into execution", cmd_s},
+  { "info","print regs", cmd_info},
+  { "x","print mem", cmd_x},
+  { "p","expression",cmd_p},
 
   /* TODO: Add more commands */
 
@@ -107,12 +175,14 @@ void sdb_mainloop() {
 
     /* extract the first token as the command */
     char *cmd = strtok(str, " ");
+    //printf("%s\n",cmd);
     if (cmd == NULL) { continue; }
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
     char *args = cmd + strlen(cmd) + 1;
+    //printf("%s\n",args);
     if (args >= str_end) {
       args = NULL;
     }
