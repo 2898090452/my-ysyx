@@ -294,7 +294,6 @@ int check(int p,int q,char* e,int len)
   printf("\n");
   if(count_y==count_z)
   {
-
     int count=count_y;
     int array[count];
     int arr=0;
