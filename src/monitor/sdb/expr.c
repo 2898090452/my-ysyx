@@ -76,6 +76,7 @@ static bool make_token(char *e) {
   int position = 0;
   int i;
   int tip=0;
+  //int lens=strlen(e);
   regmatch_t pmatch;
   nr_token = 0;
   while (e[position] != '\0') {
@@ -192,7 +193,6 @@ static bool make_token(char *e) {
            // printf("出switch\n");
 
           case TK_NOTYPE://空格不要
-          
             break;
           default: TODO();
         }
@@ -212,13 +212,14 @@ int check_parentheses(int p,int q)   //检查括号匹配函数
 {
   //LPAREN=40,   //左括号
   //RPAREN=41,   //右括号
+  printf("666\n");
   int count=0;
   if(p>=q)
-  {
-    printf("表达式错误\n");
-    return -1;
-  }
+  { printf("表达式错误\n");
+    return -1;  }
   //判断表达式是否被括号包围
+  //printf("tokens[p].type=%d tokens[q].type=%d\n",tokens[p].type,tokens[q].type);
+  //printf("左括号%c\n右括号%c\n",tokens[p].type,tokens[q].type );
   if((tokens[p].type==40)&&(tokens[q].type==41))
   {
     printf("表达式被括号包围\n");
@@ -268,9 +269,13 @@ word_t expr(char *e, bool *success)
   for(j=0;j<nr_token;j++)
   {
     if(tokens[j].type==258)
-    {printf("%d ",tokens[j].num_type);}
+    {printf("%d",tokens[j].num_type);}
+    /*else if(tokens[j].type==40||tokens[j].type==41)
+    {
+      printf("%c的序号是%d\n",tokens[j].type,j);
+    }*/
     else
-    printf("%c ",tokens[j].type);  
+    {printf("%c",tokens[j].type);}  
   }
   printf("\n");
   printf("打印完毕token数组\n");
