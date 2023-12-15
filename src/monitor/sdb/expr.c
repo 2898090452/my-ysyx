@@ -23,7 +23,7 @@ enum {
   LPAREN=40,   //左括号
   RPAREN=41,   //右括号
 };
-
+int check_parentheses(int p,int q);
 static struct rule {
   const char *regex;
   int token_type;
@@ -72,6 +72,7 @@ static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
+  int pos1=0;
   int position = 0;
   int i;
   int tip=0;
@@ -191,6 +192,7 @@ static bool make_token(char *e) {
            // printf("出switch\n");
 
           case TK_NOTYPE://空格不要
+          
             break;
           default: TODO();
         }
@@ -202,6 +204,7 @@ static bool make_token(char *e) {
       return false;
     }
   }
+  check_parentheses(pos1,nr_token-1);
   return true;
 }
 
