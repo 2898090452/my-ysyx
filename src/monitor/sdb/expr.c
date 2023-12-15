@@ -190,7 +190,7 @@ static bool make_token(char *e) {
               default:printf("here is default\n");
               break;
             }
-           // printf("出switch\n");
+           printf("出switch\n");
 
           case TK_NOTYPE://空格不要
             break;
