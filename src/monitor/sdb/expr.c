@@ -211,8 +211,8 @@ static bool make_token(char *e) {
       return false;
     }
   }
-  printf("%d/n",nr_token);
-  check(e,nr_token);
+  printf("nr_token=%d,positon=%d\n",nr_token,position);
+  check(e,position);
   return true;
 }
 int findmax(int arr[],int size)
@@ -233,13 +233,11 @@ int check(char* e,int len)
 {
   int count_z=0;
   int count_y=0;
-  //int arr=0;
-  //int array[50]={};
-  //int max;
   for(int i=0;i<len;i++)
   {
     if(e[i]==40)
     {
+      //printf("这是左括号\n");
       zkh[count_z].type=40;
       zkh[count_z].pos=i;
       zkh[count_z].num=0;
@@ -247,6 +245,7 @@ int check(char* e,int len)
     }
     else if(e[i]==41)
     {
+      //printf("这是右括号\n");
       ykh[count_y].type=41;
       ykh[count_y].pos=i;
       ykh[count_y].num=0;
@@ -281,17 +280,13 @@ int check(char* e,int len)
           z_i++;
         }
       }
-     /* for(sz=0;sz<50;sz++)
-      {
-        printf("%d ",arr[sz]);
-      }*/
-      printf("\n");
-      printf("flag=%d\n",flag);
+      //printf("\n");
+      //printf("flag=%d\n",flag);
       if(flag!=0){
         index=findmax(arr,50);//找到最大值的坐标
-        printf("最大值坐标%d\n",index);
+        //printf("最大值坐标%d\n",index);
         zkh[index].num=number;
-        printf("num=%d pos=%d\n",zkh[index].num,zkh[index].pos);
+        //printf("num=%d pos=%d\n",zkh[index].num,zkh[index].pos);
         for(sz=0;sz<50;sz++)
         {
           arr[sz]=0;
@@ -306,43 +301,61 @@ int check(char* e,int len)
       flag=0;
     }
   }
- 
   else if(count_y!=count_z)
-  {printf("括号数量不匹配\n");}
-  int z_a=0;
-  //int y_a=0;
-  for(z_a=0;z_a<count_z;z_a++)
   {
-    printf("zpos=%d ",zkh[z_a].pos);
+    printf("括号数量不匹配\n");
+    return -1;
   }
-  printf("\n");
-  for(z_a=0;z_a<count_z;z_a++)
-  {
-    printf("znum=%d ",zkh[z_a].num);
-  }
-  printf("\n");
-  for(z_a=0;z_a<count_z;z_a++)
-  {
-    printf("ypos=%d ",ykh[z_a].pos);
-  }
-  printf("\n");
-  for(z_a=0;z_a<count_z;z_a++)
-  {
-    printf("ynum=%d ",ykh[z_a].num);
-  }
-  printf("\n");
-  int temp=0;
-  for(temp=0;temp<count_z;temp++)
-  {
-    printf("左括号的位置：%d ",zkh[temp].pos);
-  }
-  printf("\n");
-  for(temp=0;temp<count_y;temp++)
-  {
-    printf("右括号的位置：%d ",ykh[temp].pos);
-  }
-  printf("\n");
   
+  int num_arr[50];
+  int num_i=0;
+  int num_dex;
+  for(num_i=0;num_i<count_z;num_i++)
+  {
+    num_arr[num_i]=zkh[num_i].num;
+  }
+  num_dex=findmax(num_arr,50);
+  if(num_dex==0)
+  {
+    printf("表达式被括号包围\n");
+  }
+  else{
+    printf("整个表达式没有被括号包围\n");
+  }
+  int z_a=0;
+  //打印括号位置和对应的num值
+    for(z_a=0;z_a<count_z;z_a++)
+    {
+      printf("左位置=%d\t",zkh[z_a].pos);
+    }
+    printf("\n");
+    for(z_a=0;z_a<count_z;z_a++)
+    {
+      printf("左数字=%d\t",zkh[z_a].num);
+    }
+    printf("\n");
+    for(z_a=0;z_a<count_z;z_a++)
+    {
+      printf("右位置=%d\t",ykh[z_a].pos);
+    }
+    printf("\n");
+    for(z_a=0;z_a<count_z;z_a++)
+    {
+      printf("右数字=%d\t",ykh[z_a].num);
+    }
+    printf("\n");
+    int temp=0;
+    for(temp=0;temp<count_z;temp++)
+    {
+      printf("左位置：%d ",zkh[temp].pos);
+    }
+    printf("\n");
+    for(temp=0;temp<count_y;temp++)
+    {
+      printf("右位置：%d ",ykh[temp].pos);
+    }
+    printf("\n");
+  printf("\n");
   return 0;
 }
 
@@ -355,16 +368,11 @@ word_t expr(char *e, bool *success)
     return 0;
   }
   int j;
-  //int temp=0;
   printf("开始打印token数组\n");
   for(j=0;j<nr_token;j++)
   {
     if(tokens[j].type==258)
     {printf("%d",tokens[j].num_type);}
-    /*else if(tokens[j].type==40||tokens[j].type==41)
-    {
-      printf("%c的序号是%d\n",tokens[j].type,j);
-    }*/
     else
     {printf("%c",tokens[j].type);}  
   }
