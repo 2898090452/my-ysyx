@@ -13,9 +13,6 @@
 * See the Mulan PSL v2 for more details.
 ***************************************************************************************/
 #include <isa.h>
-/* We use the POSIX regex functions to process regular expressions.
- * Type 'man regex' for more information about POSIX regex functions.
- */
 #include <regex.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
@@ -23,10 +20,10 @@ enum {
   LPAREN=40,   //左括号
   RPAREN=41,   //右括号
 };
-int check_parentheses(int p,int q,int len,char *e); //判断表达式中的括号匹配
-void check_enclosed(char *e,int len);   //判断整个表达式是否被括号包围
-int check_inside(char *e,int len);
-int check(int p,int q,char* e,int len);
+
+int check(char* e,int len);
+int findmax(int arr[],int size);
+
 static struct rule {
   const char *regex;
   int token_type;
@@ -43,36 +40,7 @@ static struct rule {
 
   {"==", TK_EQ},        // equal
 };
-struct stack
-{
-  char data;
-  struct stack* next;
-};
-//判断栈是否为空
-bool is_empty(struct stack* top)
-{
-  return (top==NULL);
-}
-//入栈
-void push(struct stack **top,char data)
-{
-  struct stack* new=(struct stack*)malloc(sizeof(struct stack));
-  new->data=data;
-  new->next=*top;
-  *top=new;
-}
-//出栈
-char pop(struct stack** top)
-{
-  if(is_empty(*top)){
-    return 0;
-  }
-  char data=(*top)->data;
-  struct stack* temp=*top;
-  *top=(*top)->next;
-  free(temp);
-  return data;
-}
+
 #define NR_REGEX ARRLEN(rules)  //NR_REGEX的值就等于rules数组中元素的个数
 
 static regex_t re[NR_REGEX] = {};
@@ -111,7 +79,7 @@ static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
 static bool make_token(char *e) {
-  int pos1=0;
+  //int pos1=0;
   int position = 0;
   int i;
   int tip=0;
@@ -243,244 +211,140 @@ static bool make_token(char *e) {
       return false;
     }
   }
-  /*check_parentheses(pos1,nr_token-1,nr_token,e);
-  check_inside(e,nr_token);*/
-  check(pos1,nr_token-1,e,position);
+  printf("%d/n",nr_token);
+  check(e,nr_token);
   return true;
 }
-
-
-int check(int p,int q,char* e,int len)
+int findmax(int arr[],int size)
 {
-  //struct stack* top_z=NULL;
- // struct stack* top_y=NULL;
-
+  int max=arr[0];
+  int max_dex=0;
+  for(int i=0;i<size;i++)
+  {
+    if(arr[i]>max)
+    {
+      max=arr[i];
+      max_dex=i;
+    }  
+  }
+  return max_dex;
+}
+int check(char* e,int len)
+{
   int count_z=0;
   int count_y=0;
-  int z,y;
-  //char *str=e;
+  //int arr=0;
+  //int array[50]={};
+  //int max;
   for(int i=0;i<len;i++)
   {
-    //char ch=e[i];
     if(e[i]==40)
     {
       zkh[count_z].type=40;
       zkh[count_z].pos=i;
-      zkh[count_z].num=count_z;
+      zkh[count_z].num=0;
       count_z++;
     }
     else if(e[i]==41)
     {
       ykh[count_y].type=41;
       ykh[count_y].pos=i;
-      ykh[count_y].num=count_y;
+      ykh[count_y].num=0;
       count_y++;
     }
   }
   if(count_y==count_z)
-  {printf("括号数量匹配\n");}
+  {
+    printf("括号数量匹配\n");
+    int y_j=0;
+    int z_i=0;
+    int number=1;
+    int arr[50]={};
+    int index;
+    int sz=0;
+    int flag=0;
+    for(y_j=0;y_j<count_y;y_j++)
+    {
+      z_i=0;
+      ykh[y_j].num=number;
+      while(z_i<count_z&&(zkh[z_i].pos<ykh[y_j].pos))
+      {
+        if(zkh[z_i].num==0)
+        {
+        //printf("%d ",arr[z_i]);
+        arr[z_i]=zkh[z_i].pos;
+        flag++;
+       //printf("arr=%d ",arr[z_i]);
+        z_i++;
+        }
+        else{
+          z_i++;
+        }
+      }
+     /* for(sz=0;sz<50;sz++)
+      {
+        printf("%d ",arr[sz]);
+      }*/
+      printf("\n");
+      printf("flag=%d\n",flag);
+      if(flag!=0){
+        index=findmax(arr,50);//找到最大值的坐标
+        printf("最大值坐标%d\n",index);
+        zkh[index].num=number;
+        printf("num=%d pos=%d\n",zkh[index].num,zkh[index].pos);
+        for(sz=0;sz<50;sz++)
+        {
+          arr[sz]=0;
+        }
+        number++;
+      }
+      else if(flag==0)
+      {
+        printf("括号不匹配\n");
+        return -1;
+      }
+      flag=0;
+    }
+  }
+ 
   else if(count_y!=count_z)
   {printf("括号数量不匹配\n");}
+  int z_a=0;
+  //int y_a=0;
+  for(z_a=0;z_a<count_z;z_a++)
+  {
+    printf("zpos=%d ",zkh[z_a].pos);
+  }
+  printf("\n");
+  for(z_a=0;z_a<count_z;z_a++)
+  {
+    printf("znum=%d ",zkh[z_a].num);
+  }
+  printf("\n");
+  for(z_a=0;z_a<count_z;z_a++)
+  {
+    printf("ypos=%d ",ykh[z_a].pos);
+  }
+  printf("\n");
+  for(z_a=0;z_a<count_z;z_a++)
+  {
+    printf("ynum=%d ",ykh[z_a].num);
+  }
+  printf("\n");
   int temp=0;
   for(temp=0;temp<count_z;temp++)
   {
-    printf("%d ",zkh[temp].pos);
+    printf("左括号的位置：%d ",zkh[temp].pos);
   }
   printf("\n");
   for(temp=0;temp<count_y;temp++)
   {
-    printf("%d ",ykh[temp].pos);
+    printf("右括号的位置：%d ",ykh[temp].pos);
   }
   printf("\n");
-  if(count_y==count_z)
-  {
-    int count=count_y;
-    int array[count];
-    int arr=0;
-    int max=array[0];
-    int max_dex;
-    int counts=count+count;
-    int match[counts];
-    int match_count=0;
-    for(int j=0;j<count;j++)
-    {
-      z=ykh[j].pos;
-      for(int i=0;i<count_z;i++)
-      {
-        if(zkh[i].pos<ykh[j].pos)
-        {
-          array[arr]=zkh[i].pos;
-          arr++;
-        }
-      }
-      for(int i=0;i<arr;i++)
-      { if(array[i]>=max)
-        { max=array[i];
-          max_dex=i;}
-      }
-      match[match_count]=ykh[j].pos;
-      match[match_count]=max;
-      match_count=match_count+2;
-
-
-      for(int i=0;i<count_y;i++)//将右括号数组内的的第一个元素删去
-      {
-          ykh[i]=ykh[i+1];
-      }
-      count_y--;
-
-    }
-  }
-
-
-
+  
   return 0;
 }
-
-
-
-
-
-
-bool is_matching(char left,char right){
-  if(left==40&&right==41)
-  {
-    return true;
-  }
-  else
-  return false;
-}
-int check_parentheses(int p,int q,int len,char *e)   //检查括号匹配函数
-{
-  //LPAREN=40,   //左括号
-  //RPAREN=41,   //右括号
-  //  int count=0;
-  struct stack* top=NULL;
-  for(int i=0;i<len;i++)
-  {
-    char str=e[i];
-    if(str==40)
-    push(&top,str);
-      else if(str==41)
-      {
-        if(is_empty(top))
-        {
-          printf("括号不匹配\n");
-          return -1;
-        }
-        char left=pop(&top);
-        if(!is_matching(left,str))
-        {
-          printf("括号不匹配\n");
-          return -1;
-        }
-      }
-  }
-  if(!is_empty(top))
-    printf("括号不匹配\n");
-  else
-  printf("括号匹配\n");
-  check_enclosed(e,len);
-  return 0;
-
-
-
-  /*int count_z=0;  //左括号计数器
-  int count_y=0;  //右括号计数器
-  int p1=p; //头
-  int q1=q; //尾
-  int count_zs=0;
-  int count_ys=0;
-  if(p1>=q1)
-  { printf("表达式错误\n");
-    return -1;  }
-  //判断表达式是否被括号包围
-  if((tokens[p1].type==40)&&(tokens[q1].type==41))
-  {
-    printf("表达式被括号包围\n");
-  }
-  else if((tokens[p1].type!=40)||(tokens[q1].type!=41))
-  {
-    printf("表达式没有被完整的括号包围\n");
-  }
-  //判断括号匹配
-  while(p1<=q1)
-  { 
-    if(tokens[p1].type==40)
-    {
-      count_z++;
-      if(tokens[p1+1].type==258)
-        {
-          count_zs++;
-        }
-      //p1++;
-    }
-    else if(tokens[p1].type==41)
-    {
-      count_y++;
-      //p1++;
-    }
-    else{
-      //p1++;
-    }
-    
-  }
-    if(count_z==count_y)
-    {
-      printf("括号数量匹配\n");
-    }
-    else if(count_z==count_y)
-    {
-      printf("括号数量不匹配\n");
-    }
-  return 0;*/
-}
-
-void check_enclosed(char *e,int len)
-{
-  if(e[0]!=40||e[len-1]!=41)
-  {
-    printf("整个表达式没有被括号包围\n");
-  }
-  else{
-    printf("整个表达式被括号包围\n");
-  }
-}
-//检查表达式内部的括号匹配
-int check_inside(char *e,int len)
-{
-  struct stack* top=NULL;
-  //struct stack* node=(struct stack*)malloc(sizeof(struct stack));//创建一个新节点
-  for(int i=1;i<len-1;i++)
-  {
-    char str=e[i];
-    if(e[i]==40)
-    {   push(&top,str); 
-        //node=top->next; //如果是左括号就把左括号后的数字传进去
-        //push(&node,str);
-    }
-    else if(e[i]==41)
-    {
-      if(is_empty(top))
-      {
-        printf("内部括号不匹配\n");
-        return -1;
-      }
-      char left=pop(&top);
-      if(!is_matching(left,str))
-        {
-          printf("内部括号不匹配\n");
-          return -1;
-        }
-      }
-  }
-  if(!is_empty(top))
-    printf("内部括号不匹配\n");
-  else
-  printf("内部括号匹配\n");
-  return 0;
-
-    }
 
 
 word_t expr(char *e, bool *success)
