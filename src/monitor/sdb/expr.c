@@ -14,6 +14,7 @@
 ***************************************************************************************/
 #include <isa.h>
 #include <regex.h>
+#include <ctype.h>
 enum {
   TK_NOTYPE = 256, TK_EQ,
   NUM,
@@ -78,6 +79,16 @@ static KH ykh[50]={};
 static Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used))  = 0;
 
+int tokenlength(char *e)  //数组长度函数
+{
+  //int i;
+  int position = 0;
+  while(e[position]!='\0')
+  {
+    position++;
+  }
+  return position;
+}
 static bool make_token(char *e) {
   //int pos1=0;
   int position = 0;
@@ -212,10 +223,14 @@ static bool make_token(char *e) {
     }
   }
   printf("nr_token=%d,positon=%d\n",nr_token,position);
+  int lengthtk;
+  lengthtk=tokenlength(e);  //测试数组长度函数
+  printf("数组长度为%d\n",lengthtk);
+  printf("数组长度为%d\n",position);
   check(e,position);
   return true;
 }
-int findmax(int arr[],int size)
+int findmax(int arr[],int size) //寻找数组最大值
 {
   int max=arr[0];
   int max_dex=0;
@@ -229,7 +244,7 @@ int findmax(int arr[],int size)
   }
   return max_dex;
 }
-int check(char* e,int len)
+int check(char* e,int len)  //括号匹配函数
 {
   int count_z=0;
   int count_y=0;
@@ -359,6 +374,27 @@ int check(char* e,int len)
   return 0;
 }
 
+int eval(char *e) //表达式求值函数
+{
+  int tklen;
+  tklen=tokenlength(e);
+  printf("tokenlength=%d\n",tklen);
+  if(tklen<1)
+  {   return -1;  }
+  else if(tklen==1)
+  {
+    if (isdigit(e[0]))  //检测字符串的第一个字符是不是数字
+   {
+        int num = atoi(e);
+        printf("表达式的结果是数字: %d\n", num);
+    } else 
+    {
+        printf("表达式错误\n");
+    }
+  }
+  return 0;
+  //else if(10)
+}
 
 word_t expr(char *e, bool *success)
 {
@@ -367,16 +403,16 @@ word_t expr(char *e, bool *success)
     *success = false;
     return 0;
   }
-  int j;
+  /*int j;
   printf("开始打印token数组\n");
   for(j=0;j<nr_token;j++)
-  {
-    if(tokens[j].type==258)
+  {z.type==258)
     {printf("%d",tokens[j].num_type);}
     else
     {printf("%c",tokens[j].type);}  
   }
   printf("\n");
-  printf("打印完毕token数组\n");
+  printf("打印完毕token数组\n");*/
+  eval(e);
   return 0;
 }
